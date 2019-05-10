@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+name = "pypi"
+verify_ssl = true
+
+[packages]
+openpyxl = "*"
+pyparsing = "*"
+cached-property = "*"
+
+[dev-packages]
+pylint = "*"
+pudb = "*"
+ipython = "*"
+pytest = "*"
+rope = "*"
+mypy = "*"
+pytest-cov = "*"
+black = "*"
+
+[requires]
+python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true
