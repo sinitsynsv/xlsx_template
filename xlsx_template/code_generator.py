@@ -117,28 +117,32 @@ class CodeGenerator:
     def generate_for_if(self, if_d):
         self.cell_group_level += 1
         size = "cg.Size({}, {})".format(if_d.height, if_d.width)
-        self.write_line('cell_group_{} = cg.CellGroup(initial_size={})'.format(
-            self.cell_group_level, size
-        ))
-        self.write('if ')
+        self.write_line(
+            "cell_group_{} = cg.CellGroup(initial_size={})".format(
+                self.cell_group_level, size
+            )
+        )
+        self.write("if ")
         self.generate_for(if_d.condition)
-        self.write_line(':')
+        self.write_line(":")
         self.indent()
         for node in if_d.body:
             self.generate_for(node)
         self.unindent()
         if if_d.else_block:
-            self.write_line('else:')
+            self.write_line("else:")
             self.indent()
             for node in if_d.else_block:
                 self.generate_for(node)
             self.unindent()
-        self.write_line('cell_group_{}.add_cell_group({}, {}, cell_group_{})'.format(
-            self.cell_group_level-1,
-            if_d.base_cell[0],
-            if_d.base_cell[1],
-            self.cell_group_level
-        ))
+        self.write_line(
+            "cell_group_{}.add_cell_group({}, {}, cell_group_{})".format(
+                self.cell_group_level - 1,
+                if_d.base_cell[0],
+                if_d.base_cell[1],
+                self.cell_group_level,
+            )
+        )
         self.cell_group_level -= 1
 
     def generate_for_cellgroup(self, cell_group):

@@ -57,16 +57,27 @@ class Parser:
                     target_cell_group = None
                     target_cell = None
                     for (row, col), cell_group in self.original_cell_groups.items():
-                        if (start_cell[0] >= row and start_cell[1] >= col
-                                and end_cell[0] <= row + cell_group.height
-                                and end_cell[1] <= col + cell_group.width):
+                        if (
+                            start_cell[0] >= row
+                            and start_cell[1] >= col
+                            and end_cell[0] <= row + cell_group.height
+                            and end_cell[1] <= col + cell_group.width
+                        ):
                             target_cell_group = cell_group
                             target_cell = (row, col)
                     assert target_cell_group is not None
-                    target_cell_group.body.append(nodes.Remove(
-                        base_cell=(start_cell[0] - target_cell[0], start_cell[1] - target_cell[1]),
-                        last_cell=(end_cell[0] - target_cell[0], end_cell[1] - target_cell[1])
-                    ))
+                    target_cell_group.body.append(
+                        nodes.Remove(
+                            base_cell=(
+                                start_cell[0] - target_cell[0],
+                                start_cell[1] - target_cell[1],
+                            ),
+                            last_cell=(
+                                end_cell[0] - target_cell[0],
+                                end_cell[1] - target_cell[1],
+                            ),
+                        )
+                    )
             template.body.append(sheet_node)
             del self.post_remove
             del self.original_cell_groups
@@ -164,10 +175,7 @@ class Parser:
 
     def _process_if(self, if_d):
         if_d.body = self._process_cell_group(
-            if_d.base_cell[0],
-            if_d.base_cell[1],
-            if_d.last_cell[0],
-            if_d.last_cell[1],
+            if_d.base_cell[0], if_d.base_cell[1], if_d.last_cell[0], if_d.last_cell[1]
         )
         if if_d.else_block:
             start_cell = if_d.else_block[0]
@@ -176,8 +184,7 @@ class Parser:
             else:
                 end_cell = start_cell
             if_d.else_block = self._process_cell_group(
-                start_cell[0], start_cell[1],
-                end_cell[0], end_cell[1],
+                start_cell[0], start_cell[1], end_cell[0], end_cell[1]
             )
             self.post_remove.append((start_cell, end_cell))
         return if_d
@@ -375,4 +382,3 @@ class Parser:
                 nodes.FuncArg(start_index=start_index, end_index=end_index, cells=cells)
             )
         return res
-
