@@ -17,6 +17,7 @@ rope = "*"
 mypy = "*"
 pytest-cov = "*"
 black = "*"
+tox-venv = "*"
 
 [requires]
 python_version = "3.6"

@@ -1,7 +1,9 @@
 import os
+import sys
 import shutil
 import datetime
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "tests"))
 import data_generators
 from xlsx_template import Template
 
