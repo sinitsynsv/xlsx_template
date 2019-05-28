@@ -5,6 +5,7 @@ with open("README.md", "r") as fh:
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
+    requirements = [r for r in requirements if "-i https://pypi.org/simple" not in r]
 
 setuptools.setup(
     name="xlsx_template",
