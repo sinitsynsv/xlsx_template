@@ -48,7 +48,7 @@ class StrictGetItemStrategy:
 
 class Environment:
 
-    filters = {"default_if_none": filters.default_if_none}
+    filters = {"default_if_none": filters.default_if_none, "yes_no": filters.yes_no}
 
     def __init__(
         self, resolve_strategy=None, get_attr_strategy=None, get_item_strategy=None
