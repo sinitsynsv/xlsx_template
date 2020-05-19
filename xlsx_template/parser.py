@@ -87,7 +87,7 @@ class Parser:
         body = []
         for row in range(start_row, end_row + 1):
             for col in range(start_col, end_col + 1):
-                if (row, col) in self.directives:
+                if (row, col) in self.directives and self.directives[(row, col)]:
                     cur_directives = self.directives[(row, col)]
                     cur_directive = cur_directives.pop(0)
                     if not cur_directives:
@@ -172,6 +172,18 @@ class Parser:
 
     def parse_if(self, directive_def):
         return self._parse_pp(grammar.parse_if, directive_def)
+
+    def parse_col_width(self, directive_def):
+        return self._parse_pp(grammar.parse_col_width, directive_def)
+
+    def parse_row_height(self, directive_def):
+        return self._parse_pp(grammar.parse_row_height, directive_def)
+
+    def _process_colwidth(self, col_width):
+        self.cells[col_width.base_cell].col_width = col_width.value
+
+    def _process_rowheight(self, row_height):
+        self.cells[row_height.base_cell].row_height = row_height.value
 
     def _process_if(self, if_d):
         if_d.body = self._process_cell_group(
@@ -345,12 +357,12 @@ class Parser:
         node_kwargs = {
             "base_cell": (row, col),
             "style": style_name,
-            "row_height": ws.row_dimensions[row].height,
-            "col_width": col_width,
+            "row_height": nodes.Const(value=ws.row_dimensions[row].height),
+            "col_width": nodes.Const(value=col_width),
         }
         node_class = nodes.CellOutput
         if cell.value:
-            if cell.value.startswith("="):
+            if isinstance(cell.value, str) and cell.value.startswith("="):
                 value = cell.value
                 node_kwargs["args"] = self.parse_func_args(value)
                 node_class = nodes.FuncCellOutput

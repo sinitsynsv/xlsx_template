@@ -15,6 +15,11 @@ class Symbols:
         self.symbols[name].append("{}_{}".format(name, len(self.symbols[name])))
         return self.symbols[name][-1]
 
+    def undeclare_ref(self, name):
+        self.symbols[name].pop(-1)
+        if not self.symbols[name]:
+            self.symbols.pop(name)
+
     def add_ref(self, name, real_name):
         self.symbols[name].append(real_name)
 
@@ -206,6 +211,8 @@ class CodeGenerator:
             )
         )
         self.cell_group_level -= 1
+        self.symbols.undeclare_ref("loop")
+        self.symbols.undeclare_ref(cell_loop.target)
 
     def generate_for_funccelloutput(self, func_cell_output):
         self.write_line("fargs = [")
@@ -215,19 +222,23 @@ class CodeGenerator:
             self.write_line(",")
         self.unindent()
         self.write_line("]")
+        self.write("row_height = ")
+        self.generate_for(func_cell_output.row_height)
+        self.newline()
+        self.write("col_width = ")
+        self.generate_for(func_cell_output.col_width)
+        self.newline()
         style = (
             None
             if func_cell_output.style is None
             else "'{}'".format(func_cell_output.style)
         )
         self.write(
-            "cell = cg.FuncCell({}, {}, {}, '{}', {}, {}, fargs, ".format(
+            "cell = cg.FuncCell({}, {}, {}, '{}', row_height, col_width, fargs, ".format(
                 func_cell_output.base_cell[0],
                 func_cell_output.base_cell[1],
                 style,
                 func_cell_output.value,
-                func_cell_output.row_height,
-                func_cell_output.col_width,
             )
         )
         if func_cell_output.default_value:
@@ -285,6 +296,12 @@ class CodeGenerator:
 
     def generate_for_celloutput(self, cell_output):
         style = None if cell_output.style is None else "'{}'".format(cell_output.style)
+        self.write("row_height = ")
+        self.generate_for(cell_output.row_height)
+        self.newline()
+        self.write("col_width = ")
+        self.generate_for(cell_output.col_width)
+        self.newline()
         self.write(
             "cell = cg.Cell({}, {}, {}, ".format(
                 cell_output.base_cell[0], cell_output.base_cell[1], style
@@ -294,7 +311,7 @@ class CodeGenerator:
             self.generate_for(cell_output.value)
         else:
             self.write("None")
-        self.write(", {}, {})".format(cell_output.row_height, cell_output.col_width))
+        self.write(", row_height, col_width)")
         self.newline()
         self.write_line("cell_group_{}.add_cell(cell)".format(self.cell_group_level))
         if cell_output.merge:

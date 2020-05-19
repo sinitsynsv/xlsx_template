@@ -303,3 +303,11 @@ if_d.setParseAction(if_pa)
 
 def parse_if(s):
     return if_d.parseString(s, True).asList()[0]
+
+
+def parse_col_width(s):
+    return nodes.ColWidth(value=parse_expr_with_filter(s))
+
+
+def parse_row_height(s):
+    return nodes.RowHeight(value=parse_expr_with_filter(s))

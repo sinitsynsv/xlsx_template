@@ -169,3 +169,11 @@ class FuncCellOutput(CellOutput):
                 for cell in arg.cells
             ]
         super().adjust(row, col)
+
+
+class ColWidth(Node):
+    value = None
+
+
+class RowHeight(Node):
+    value = None

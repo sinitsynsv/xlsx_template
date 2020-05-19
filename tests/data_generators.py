@@ -67,3 +67,7 @@ def generate_for_test_merge():
 
 def generate_for_test_if():
     return {"rows": [{"value": value, "is_red": value % 2 == 0} for value in range(10)]}
+
+
+def generate_for_test_column_width():
+    return {"cells": [{"dim_value": 10 * index} for index in range(1, 6)]}
