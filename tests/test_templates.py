@@ -142,3 +142,11 @@ def test_if(render_template):
         value1 = ws["A{}".format(row)].value
         value2 = "red" if value1 % 2 == 0 else "green"
         assert ws["B{}".format(row)].value == value2
+
+
+def test_sheet_loop(render_template):
+    data = data_generators.generate_for_sheet_loop()
+    wb = render_template("test_sheet_loop.xlsx", data)
+    for index in range(1, 11):
+        ws = wb[f"Sheet # {index}"]
+        assert ws["A1"].value == f"Sheet var # {index}"

@@ -222,6 +222,25 @@ def parse_cell_loop_directive(s):
     return cell_loop.parseString(s, True).asList()[0]
 
 
+sheet_loop = for_statement("stmt") + pp.Group(
+    pp.Optional(COMMA + pp.delimitedList(make_param("name", name)))
+)("params")
+
+
+def sheet_loop_pa(r):
+    keywords = {param["name"]: param["value"] for param in r["params"].asList()}
+    return nodes.SheetLoop(
+        target=r["stmt"]["target"], items=r["stmt"]["items"], **keywords
+    )
+
+
+sheet_loop.setParseAction(sheet_loop_pa)
+
+
+def parse_sheet_loop_directive(s):
+    return sheet_loop.parseString(s, True).asList()[0]
+
+
 merge = pp.delimitedList(make_param("rows", expr) | make_param("cols", expr))
 
 

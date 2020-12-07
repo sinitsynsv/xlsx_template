@@ -43,12 +43,16 @@ class Parser:
             self.source_hint.append("sheet name")
             sheet_name_node = self.parse_value(sheet_name)
             self.source_hint.pop()
-            sheet_node = nodes.Sheet(
-                name=nodes.ToStr(value=sheet_name_node),
-                max_row=ws.max_row,
-                max_col=ws.max_column,
-                body=body,
-            )
+            if isinstance(body[0], nodes.SheetLoop):
+                root_node = body[0]
+                root_node.sheet.name=nodes.ToStr(value=sheet_name_node)
+            else:
+                root_node = nodes.Sheet(
+                    name=nodes.ToStr(value=sheet_name_node),
+                    max_row=ws.max_row,
+                    max_col=ws.max_column,
+                    body=body,
+                )
             self.source_hint.pop()
 
             assert not self.source_hint
@@ -78,7 +82,7 @@ class Parser:
                             ),
                         )
                     )
-            template.body.append(sheet_node)
+            template.body.append(root_node)
             del self.post_remove
             del self.original_cell_groups
         return template, list(self.styles.values())
@@ -90,6 +94,8 @@ class Parser:
                 if (row, col) in self.directives and self.directives[(row, col)]:
                     cur_directives = self.directives[(row, col)]
                     cur_directive = cur_directives.pop(0)
+                    if isinstance(cur_directive, nodes.SheetLoop):
+                        cur_directive.last_cell = (end_row, end_col)
                     if not cur_directives:
                         del self.directives[(row, col)]
                     method = getattr(
@@ -210,6 +216,21 @@ class Parser:
         )
         return cell_group
 
+    def _process_sheetloop(self, sheet_loop):
+        sheet = nodes.Sheet(
+            None,
+            max_row=sheet_loop.last_cell[0],
+            max_col=sheet_loop.last_cell[1],
+            body=self._process_cell_group(
+                sheet_loop.base_cell[0],
+                sheet_loop.base_cell[1],
+                sheet_loop.last_cell[0],
+                sheet_loop.last_cell[1],
+            ),
+        )
+        sheet_loop.sheet = sheet
+        return sheet_loop
+
     def parse_func_arg_v(self, directive_def):
         return nodes.FuncArgDirection(direction=FuncArgDirection.VERTICAL)
 
@@ -237,6 +258,10 @@ class Parser:
         node.direction = loop_direction
         if node.last_cell is None:
             node.last_cell = node.base_cell
+        return node
+
+    def parse_loop_sheet(self, directive_def):
+        node = self._parse_pp(grammar.parse_sheet_loop_directive, directive_def)
         return node
 
     def get_directives(self, ws):

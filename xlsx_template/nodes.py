@@ -142,6 +142,13 @@ class CellLoop(CellGroup):
     direction = None
 
 
+class SheetLoop(CellGroup):
+    target = None
+    items = None
+    name = None
+    sheet = None
+
+
 class FuncArg(Node):
     start_index = None
     end_index = None

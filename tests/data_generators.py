@@ -71,3 +71,16 @@ def generate_for_test_if():
 
 def generate_for_test_column_width():
     return {"cells": [{"dim_value": 10 * index} for index in range(1, 6)]}
+
+
+def generate_for_sheet_loop():
+    return {
+        "sheets": [
+            {
+                "name": f"Sheet # {index}",
+                "sheet_var": f"Sheet var # {index}",
+                "numbers": list(range(index)),
+            }
+            for index in range(1, 11)
+        ]
+    }

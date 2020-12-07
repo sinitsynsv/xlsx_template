@@ -103,6 +103,21 @@ class CodeGenerator:
         )
         self.unindent()
 
+    def generate_for_sheetloop(self, sheet_loop):
+        loop_ref = self.symbols.declare_ref("loop")
+        if sheet_loop.name:
+            self.symbols.add_ref("{}_loop".format(sheet_loop.name), loop_ref)
+        self.write("{} = LoopContext(".format(loop_ref))
+        self.generate_for(sheet_loop.items)
+        self.write_line(")")
+        target_ref = self.symbols.declare_ref(sheet_loop.target)
+        self.write_line("for {} in {}:".format(target_ref, loop_ref))
+        self.indent()
+        self.generate_for_sheet(sheet_loop.sheet)
+        self.unindent()
+        self.symbols.undeclare_ref("loop")
+        self.symbols.undeclare_ref(sheet_loop.target)
+
     def generate_for_remove(self, remove):
         size = "cg.Size({}, {})".format(remove.height, remove.width)
         self.write_line(

@@ -25,6 +25,7 @@ EXAMPLE_DEF = [
     ("test_if.xlsx", data_generators.generate_for_test_if),
     ("loop_with_formulas.xlsx", data_generators.generate_for_loop_with_formulas),
     ("test_column_width.xlsx", data_generators.generate_for_test_column_width),
+    ("test_sheet_loop.xlsx", data_generators.generate_for_sheet_loop),
 ]
 
 EXAMPLE_DEF = [
