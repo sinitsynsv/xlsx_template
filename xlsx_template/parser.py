@@ -43,12 +43,16 @@ class Parser:
             self.source_hint.append("sheet name")
             sheet_name_node = self.parse_value(sheet_name)
             self.source_hint.pop()
-            sheet_node = nodes.Sheet(
-                name=nodes.ToStr(value=sheet_name_node),
-                max_row=ws.max_row,
-                max_col=ws.max_column,
-                body=body,
-            )
+            if isinstance(body[0], nodes.SheetLoop):
+                root_node = body[0]
+                root_node.sheet.name=nodes.ToStr(value=sheet_name_node)
+            else:
+                root_node = nodes.Sheet(
+                    name=nodes.ToStr(value=sheet_name_node),
+                    max_row=ws.max_row,
+                    max_col=ws.max_column,
+                    body=body,
+                )
             self.source_hint.pop()
 
             assert not self.source_hint
@@ -78,7 +82,7 @@ class Parser:
                             ),
                         )
                     )
-            template.body.append(sheet_node)
+            template.body.append(root_node)
             del self.post_remove
             del self.original_cell_groups
         return template, list(self.styles.values())
@@ -87,9 +91,11 @@ class Parser:
         body = []
         for row in range(start_row, end_row + 1):
             for col in range(start_col, end_col + 1):
-                if (row, col) in self.directives:
+                if (row, col) in self.directives and self.directives[(row, col)]:
                     cur_directives = self.directives[(row, col)]
                     cur_directive = cur_directives.pop(0)
+                    if isinstance(cur_directive, nodes.SheetLoop):
+                        cur_directive.last_cell = (end_row, end_col)
                     if not cur_directives:
                         del self.directives[(row, col)]
                     method = getattr(
@@ -173,6 +179,18 @@ class Parser:
     def parse_if(self, directive_def):
         return self._parse_pp(grammar.parse_if, directive_def)
 
+    def parse_col_width(self, directive_def):
+        return self._parse_pp(grammar.parse_col_width, directive_def)
+
+    def parse_row_height(self, directive_def):
+        return self._parse_pp(grammar.parse_row_height, directive_def)
+
+    def _process_colwidth(self, col_width):
+        self.cells[col_width.base_cell].col_width = col_width.value
+
+    def _process_rowheight(self, row_height):
+        self.cells[row_height.base_cell].row_height = row_height.value
+
     def _process_if(self, if_d):
         if_d.body = self._process_cell_group(
             if_d.base_cell[0], if_d.base_cell[1], if_d.last_cell[0], if_d.last_cell[1]
@@ -197,6 +215,21 @@ class Parser:
             cell_group.last_cell[1],
         )
         return cell_group
+
+    def _process_sheetloop(self, sheet_loop):
+        sheet = nodes.Sheet(
+            None,
+            max_row=sheet_loop.last_cell[0],
+            max_col=sheet_loop.last_cell[1],
+            body=self._process_cell_group(
+                sheet_loop.base_cell[0],
+                sheet_loop.base_cell[1],
+                sheet_loop.last_cell[0],
+                sheet_loop.last_cell[1],
+            ),
+        )
+        sheet_loop.sheet = sheet
+        return sheet_loop
 
     def parse_func_arg_v(self, directive_def):
         return nodes.FuncArgDirection(direction=FuncArgDirection.VERTICAL)
@@ -225,6 +258,10 @@ class Parser:
         node.direction = loop_direction
         if node.last_cell is None:
             node.last_cell = node.base_cell
+        return node
+
+    def parse_loop_sheet(self, directive_def):
+        node = self._parse_pp(grammar.parse_sheet_loop_directive, directive_def)
         return node
 
     def get_directives(self, ws):
@@ -345,12 +382,12 @@ class Parser:
         node_kwargs = {
             "base_cell": (row, col),
             "style": style_name,
-            "row_height": ws.row_dimensions[row].height,
-            "col_width": col_width,
+            "row_height": nodes.Const(value=ws.row_dimensions[row].height),
+            "col_width": nodes.Const(value=col_width),
         }
         node_class = nodes.CellOutput
         if cell.value:
-            if cell.value.startswith("="):
+            if isinstance(cell.value, str) and cell.value.startswith("="):
                 value = cell.value
                 node_kwargs["args"] = self.parse_func_args(value)
                 node_class = nodes.FuncCellOutput

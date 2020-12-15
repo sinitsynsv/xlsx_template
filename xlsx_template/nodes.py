@@ -142,6 +142,13 @@ class CellLoop(CellGroup):
     direction = None
 
 
+class SheetLoop(CellGroup):
+    target = None
+    items = None
+    name = None
+    sheet = None
+
+
 class FuncArg(Node):
     start_index = None
     end_index = None
@@ -169,3 +176,11 @@ class FuncCellOutput(CellOutput):
                 for cell in arg.cells
             ]
         super().adjust(row, col)
+
+
+class ColWidth(Node):
+    value = None
+
+
+class RowHeight(Node):
+    value = None

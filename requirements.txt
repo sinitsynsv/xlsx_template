@@ -1,6 +1,5 @@
--i https://pypi.org/simple
-cached-property==1.5.1
-et-xmlfile==1.0.1
-jdcal==1.4.1
-openpyxl==2.6.2
-pyparsing==2.4.0
+cached-property==1.5.2
+et-xmlfile==1.0.1; python_version >= "3.6"
+jdcal==1.4.1; python_version >= "3.6"
+openpyxl==3.0.5; python_version >= "3.6"
+pyparsing==2.4.7; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
