@@ -415,7 +415,7 @@ class LoopCellGroup(BaseCellGroup):
                 for cell in cells:
                     cell.move(row_offsets[index], col_offsets[index])
                     final_func_cells[(row, col)].append(cell)
-            for merge in cell_group.merges:
+            for merge in cell_group.get_final_merges():
                 merge.move(row_offsets[index], col_offsets[index])
                 final_merges.append(merge)
 
