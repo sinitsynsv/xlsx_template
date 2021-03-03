@@ -229,28 +229,28 @@ class CellGroup(BaseCellGroup):
         for (row, col), cell_group in self.cell_groups.items():
             final_size = cell_group.get_final_size()
             if final_size.width > cell_group.initial_size.width:
+                for i in range(cell_group.initial_size.width):
+                    col_offsets[col + i][row] = 0
                 col_offsets[col + 1][row] = (
                     final_size.width - cell_group.initial_size.width
                 )
             else:
                 for i in range(col, col + final_size.width):
-                    col_offsets[i][row] = max(
-                        col_offsets[i][row] or 0, 0
-                    )
+                    col_offsets[i][row] = max(col_offsets[i][row] or 0, 0)
                 for i in range(
                     col + final_size.width, col + cell_group.initial_size.width
                 ):
                     col_offsets[i][row] = -1
 
             if final_size.height > cell_group.initial_size.height:
+                for i in range(cell_group.initial_size.height):
+                    row_offsets[row + i][col] = 0
                 row_offsets[row + 1][col] = (
                     final_size.height - cell_group.initial_size.height
                 )
             else:
                 for i in range(row, row + final_size.height):
-                    row_offsets[i][col] = max(
-                        row_offsets[i][col] or 0, 0
-                    )
+                    row_offsets[i][col] = max(row_offsets[i][col] or 0, 0)
                 for i in range(
                     row + final_size.height, row + cell_group.initial_size.height
                 ):
