@@ -126,12 +126,16 @@ class If(CellGroup):
 
 class Sheet(CellGroup):
     name = None
+    sheet_state = None
 
-    def __init__(self, name, max_row, max_col, body):
+    def __init__(self, name, max_row, max_col, body, sheet_state=None):
         super().__init__(
             base_cell=(0, 0), last_cell=(max_row - 1, max_col - 1), body=body
         )
         self.name = name
+        self.sheet_state = sheet_state
+        if not self.sheet_state:
+            self.sheet_state = ToStr(value="visible")
 
 
 class CellLoop(CellGroup):

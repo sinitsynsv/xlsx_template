@@ -76,6 +76,9 @@ class CodeGenerator:
         self.generate_for(sheet_node.name)
         self.write(")")
         self.newline()
+        self.write("sheet.sheet_state = ")
+        self.generate_for(sheet_node.sheet_state)
+        self.newline()
         size = "cg.Size({}, {})".format(
             sheet_node.last_cell[0] + 1, sheet_node.last_cell[1] + 1
         )
