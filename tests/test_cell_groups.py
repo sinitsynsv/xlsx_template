@@ -152,3 +152,55 @@ def test_negative_row_offset():
     ]
     result = sheet_cell_group.final_result.get_simple_display()
     assert result == valid_result
+
+
+def test_offsets():
+    """
+    Test when one group has smaller size, and another bigger
+    """
+    cell_group0 = CellGroup(Size(2, 2))
+
+    cell_group1 = CellGroup(Size(1, 2))
+    cell_group0.add_cell_group(0, 0, cell_group1)
+
+    cell_group1 = CellGroup(Size(1, 2))
+    cell_group1.add_cell(Cell(0, 0, "s1", "value", 0, 0))
+    cell_group2 = LoopCellGroup(Size(1, 1), LoopDirection.RIGHT)
+    for i in range(3):
+        cell_group3 = CellGroup(initial_size=Size(1, 1))
+        cell_group3.add_cell(Cell(0, 0, "s1", i, 0, 0))
+        cell_group2.add_cell_group(cell_group3)
+    cell_group1.add_cell_group(0, 1, cell_group2)
+    cell_group0.add_cell_group(1, 0, cell_group1)
+    valid_result = {
+        (1, 0): [Cell(0, 0, "s1", "value", 0, 0)],
+        (1, 1): [
+            Cell(0, 1, "s1", 0, 0, 0),
+            Cell(0, 2, "s1", 1, 0, 0),
+            Cell(0, 3, "s1", 2, 0, 0),
+        ],
+    }
+    assert cell_group0.get_final_cells() == valid_result
+
+    cell_group0 = CellGroup(Size(2, 2))
+    cell_group1 = CellGroup(Size(2, 1))
+    cell_group0.add_cell_group(0, 0, cell_group1)
+
+    cell_group1 = CellGroup(Size(2, 1))
+    cell_group1.add_cell(Cell(0, 0, "s1", "value", 0, 0))
+    cell_group2 = LoopCellGroup(Size(1, 1), LoopDirection.DOWN)
+    for i in range(3):
+        cell_group3 = CellGroup(Size(1, 1))
+        cell_group3.add_cell(Cell(0, 0, "s1", i, 0, 0))
+        cell_group2.add_cell_group(cell_group3)
+    cell_group1.add_cell_group(1, 0, cell_group2)
+    cell_group0.add_cell_group(0, 1, cell_group1)
+    valid_result = {
+        (0, 1): [Cell(0, 0, "s1", "value", 0, 0)],
+        (1, 1): [
+            Cell(1, 0, "s1", 0, 0, 0),
+            Cell(2, 0, "s1", 1, 0, 0),
+            Cell(3, 0, "s1", 2, 0, 0),
+        ],
+    }
+    assert cell_group0.get_final_cells() == valid_result
