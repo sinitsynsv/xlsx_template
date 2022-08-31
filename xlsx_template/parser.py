@@ -42,16 +42,19 @@ class Parser:
             body = self._process_cell_group(1, 1, ws.max_row, ws.max_column)
             self.source_hint.append("sheet name")
             sheet_name_node = self.parse_value(sheet_name)
+            sheet_state_node = self.parse_value(ws.sheet_state)
             self.source_hint.pop()
             if isinstance(body[0], nodes.SheetLoop):
                 root_node = body[0]
                 root_node.sheet.name=nodes.ToStr(value=sheet_name_node)
+                root_node.sheet.sheet_state=nodes.ToStr(value=sheet_state_node)
             else:
                 root_node = nodes.Sheet(
                     name=nodes.ToStr(value=sheet_name_node),
                     max_row=ws.max_row,
                     max_col=ws.max_column,
                     body=body,
+                    sheet_state=nodes.ToStr(value=sheet_state_node),
                 )
             self.source_hint.pop()
 
