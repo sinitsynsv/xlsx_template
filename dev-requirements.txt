@@ -34,7 +34,7 @@ prompt-toolkit==3.0.8; python_full_version >= "3.6.1" and python_version >= "3.7
 ptyprocess==0.6.0; sys_platform != "win32" and python_version >= "3.7"
 pudb==2019.2
 py==1.9.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
-pygments==2.7.3; python_version >= "3.7"
+pygments==2.15.0; python_version >= "3.7"
 pylint==2.6.0; python_version >= "3.5"
 pyparsing==2.4.7; (python_version >= "2.6" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0")
 pytest-cov==2.10.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
